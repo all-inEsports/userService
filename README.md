@@ -26,6 +26,7 @@ npm run start
 ```sh
 GET /v1/users?page=1&perPage=10
 GET /v1/users/:id
+GET /v1/find/:username
 POST /v1/user
 PUT /v1/users/:id
 DELETE /v1/users/:id

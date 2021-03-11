@@ -56,6 +56,15 @@ module.exports = (mongoDBConnectionString) => {
         }
       });
     },
+    getUserByName: (UserName) => {
+      return new Promise((resolve,reject)=>{
+        User.findOne({UserName})
+        .exec()
+        .then((user)=>resolve(user))
+        .catch((err)=>reject(err))
+      });
+
+    },
     getUserById: function (id) {
       return new Promise((resolve, reject) => {
         User.findOne({ _id: id })

@@ -46,6 +46,17 @@ app.get("/v1/users/:id", (req, res) => {
     });
 });
 
+app.get("/v1/find/:username", (req, res) => {
+  data
+    .getUserByName(req.params.username)
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((err) => {
+      res.json({ message: `an error occurred: ${err}` });
+    });
+});
+
 app.put("/v1/users/:id", (req, res) => {
   data
     .updateUserById(req.body, req.params.id)
