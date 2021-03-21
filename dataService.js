@@ -56,11 +56,18 @@ module.exports = (mongoDBConnectionString) => {
         }
       });
     },
-    getUserByName: (UserName) => {
+    getUserByName: (userData) => {
       return new Promise((resolve,reject)=>{
-        User.findOne({UserName})
+        User.findOne({UserName: userData.UserName})
+        .limit(1)
         .exec()
-        .then((user)=>resolve(user))
+        .then((user)=>{
+            if(user.Password === userData.Password){
+              resolve(user);
+            }else{
+              reject("Incorrect Password."); 
+            }
+        })
         .catch((err)=>reject(err))
       });
 
