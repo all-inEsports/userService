@@ -58,11 +58,11 @@ module.exports = (mongoDBConnectionString) => {
     },
     getUserByName: (userData) => {
       return new Promise((resolve,reject)=>{
-        User.findOne({UserName: userData.UserName})
+        User.findOne({UserName: userData.username})
         .limit(1)
         .exec()
         .then((user)=>{
-            if(user.Password === userData.Password){
+            if(user.Password === userData.password){
               resolve(user);
             }else{
               reject("Incorrect Password."); 
