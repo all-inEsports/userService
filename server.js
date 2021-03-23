@@ -52,7 +52,7 @@ app.get("/v1/users/:id", async (req, res) => {
     });
 });
 
-app.get("/v1/login", (req, res) => {
+app.post("/v1/login", (req, res) => {
   data
     .getUserByName(req.body)
     .then((data) => {
