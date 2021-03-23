@@ -1,43 +1,18 @@
 require("dotenv").config();
-console.log(process.env.URI);
+//URI="mongodb+srv://admin:TtFK1ahj1hbgwyp0@cluster0.d3oyk.mongodb.net/user?retryWrites=true&w=majority"
+console.log(URI);
 const express = require("express");
 const app = express();
 const UsersController = require("./controller/Users");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const data = require("./dataService")(process.env.URI);
-const port = process.env.PORT || 3000;
+const data = require("./dataService")(URI);
+const port = 3000;
 const jwt = require('jsonwebtoken');
-const passport = require("passport");
-const passportJWT = require("passport-jwt");
-var ExtractJwt = passportJWT.ExtractJwt;
-var JwtStrategy = passportJWT.Strategy;
 
 var jwtOptions = {};
-jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme("jwt");
 
 jwtOptions.secretOrKey = '&0y7$noP#5rt99&GB%Pz7j2b1vkzaB0RKs%^N^0zOP89NT04mPuaM!&G8cbNZOtH';
-
-var strategy = new JwtStrategy(jwtOptions, function (jwt_payload, next) {
-  console.log('payload received', jwt_payload);
-
-  if (jwt_payload) {
-      // The following will ensure that all routes using 
-      // passport.authenticate have a req.user._id, req.user.userName, req.user.fullName & req.user.role values 
-      // that matches the request payload data
-      next(null, { 
-          _id: jwt_payload._id, 
-          UserName: jwt_payload.UserName,  
-          Balance: jwt_payload.Balance 
-        }); 
-  } else {
-      next(null, false);
-  }
-});
-
-passport.use(strategy);
-
-app.use(passport.initialize());
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -66,7 +41,7 @@ app.get("/v1/users", async (req, res) => {
     });
 });
 
-app.get("/v1/users/:id", (req, res) => {
+app.get("/v1/users/:id", async (req, res) => {
   data
     .getUserById(req.params.id)
     .then((data) => {
@@ -77,16 +52,15 @@ app.get("/v1/users/:id", (req, res) => {
     });
 });
 
-app.get("/v1/find/:username", (req, res) => {
+app.get("/v1/login", (req, res) => {
   data
     .getUserByName(req.body)
     .then((data) => {
       var payload = {
-        _id = data._id,
-        UserName = data.UserName,
-        Balance = data.Balance
+        _id: data._id,
+        UserName: data.UserName,
+        Balance: data.Balance
       }
-
       var token = jwt.sign(payload, jwtOptions.secretOrKey);
 
       res.json({"message":"login successful", "token": token});
