@@ -1,6 +1,4 @@
 require("dotenv").config();
-//URI="mongodb+srv://admin:TtFK1ahj1hbgwyp0@cluster0.d3oyk.mongodb.net/user?retryWrites=true&w=majority"
-console.log(URI);
 const express = require("express");
 const app = express();
 const UsersController = require("./controller/Users");
