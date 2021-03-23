@@ -7,10 +7,38 @@ const cors = require("cors");
 const data = require("./dataService")(process.env.URI);
 const port = process.env.PORT || 3000;
 const jwt = require('jsonwebtoken');
+const passport = require("passport");
+const passportJWT = require("passport-jwt");
+var ExtractJwt = passportJWT.ExtractJwt;
+var JwtStrategy = passportJWT.Strategy;
 
 var jwtOptions = {};
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme("jwt");
 
 jwtOptions.secretOrKey = '&0y7$noP#5rt99&GB%Pz7j2b1vkzaB0RKs%^N^0zOP89NT04mPuaM!&G8cbNZOtH';
+
+var strategy = new JwtStrategy(jwtOptions, function (jwt_payload, next) {
+  console.log('payload received', jwt_payload);
+
+  if (jwt_payload) {
+      // The following will ensure that all routes using 
+      // passport.authenticate have a req.user._id, req.user.userName, req.user.fullName & req.user.role values 
+      // that matches the request payload data
+      next(null, { 
+          _id: jwt_payload._id, 
+          UserName: jwt_payload.UserName,
+          Balance: jwt_payload.Balance 
+        }); 
+  } else {
+      next(null, false);
+  }
+});
+
+passport.use(strategy);
+
+app.use(passport.initialize());
+
+
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -54,6 +82,7 @@ app.post("/v1/login", (req, res) => {
   data
     .getUserByName(req.body)
     .then((data) => {
+      console.log(data)
       var payload = {
         _id: data._id,
         UserName: data.UserName,
@@ -66,6 +95,8 @@ app.post("/v1/login", (req, res) => {
     .catch((err) => {
       res.status(422).json({ message: `an error occurred: ${err}` });
     });
+
+    
 });
 
 app.put("/v1/users/:id", (req, res) => {
