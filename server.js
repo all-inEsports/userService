@@ -5,6 +5,7 @@ const UsersController = require("./controller/Users");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const data = require("./dataService")(process.env.URI);
+const BetController = require("./controller/Bet")();
 const port = process.env.PORT || 3000;
 const jwt = require('jsonwebtoken');
 
@@ -54,14 +55,14 @@ app.post("/v1/login", (req, res) => {
   data
     .getUserByName(req.body)
     .then((data) => {
-      var payload = {
+      let payload = {
         _id: data._id,
         UserName: data.UserName,
         Balance: data.Balance
       }
-      var token = jwt.sign(payload, jwtOptions.secretOrKey);
+      let token = jwt.sign(payload, jwtOptions.secretOrKey);
 
-      res.json({"message":"login successful", "token": token});
+      res.json({ "message": "login successful", "token": token });
     })
     .catch((err) => {
       res.status(422).json({ message: `an error occurred: ${err}` });
@@ -72,7 +73,14 @@ app.put("/v1/users/:id", (req, res) => {
   data
     .updateUserById(req.body, req.params.id)
     .then((msg) => {
-      res.json({ message: msg });
+      let payload = {
+        _id: data._id,
+        UserName: data.UserName,
+        Balance: data.Balance
+      }
+      let token = jwt.sign(payload, jwtOptions.secretOrKey);
+
+      res.json({ "message": msg, "token": token });
     })
     .catch((err) => {
       res.json({ message: `an error occurred: ${err}` });
@@ -88,6 +96,60 @@ app.delete("/v1/users/:id", (req, res) => {
     .catch((err) => {
       res.json({ message: `an error occurred: ${err}` });
     });
+});
+
+app.post("/v1/bet", (req, res) => BetController.addNewBet(req.body).then((msg) => {
+  res.json({ message: msg });
+})
+  .catch((err) => {
+    res.json({ message: `an error occurred: ${err}` });
+  })
+);
+
+app.put("/v1/bet/resolve/:id", (req, res) => BetController.resolveBet(req.params.id).then((msg) => {
+  res.json({ message: msg });
+})
+  .catch((err) => {
+    res.json({ message: `an error occurred: ${err}` });
+  })
+);
+
+app.get("/v1/match/bets/:id", (req, res) => {
+  BetController.getAllBetByMatchId(req.params.id).then((data) => {
+    res.json(data);
+  })
+    .catch((err) => {
+      res.json({ message: `an error occurred: ${err}` });
+    })
+})
+
+app.get("/v1/user/bets/:username", (req, res) => {
+
+  if (req.params.inProgress == true) {
+    BetController.getAllUserBetsInProgress(req.params.username).then((data) => {
+      res.json(data);
+    })
+      .catch((err) => {
+        res.json({ message: `an error occurred: ${err}` });
+      })
+  }
+  else if (req.params.inProgress == false) {
+    BetController.getAllUserBetsInProgress(req.params.username, req.params.inProgress).then((data) => {
+      res.json(data);
+    })
+      .catch((err) => {
+        res.json({ message: `an error occurred: ${err}` });
+      })
+  }
+  else {
+    BetController.getAllUserBets(req.params.username).then((data) => {
+      res.json(data);
+    })
+      .catch((err) => {
+        res.json({ message: `an error occurred: ${err}` });
+      })
+  }
+
 });
 
 data
