@@ -100,6 +100,24 @@ module.exports = (mongoDBConnectionString) => {
           });
       });
     },
+    updateUserBalance : function (Balance,id) {
+      return new Promise((resolve, reject) => {
+        User.updateOne(
+          { _id: id },
+          {
+            Balance,
+          }
+        )
+          .exec()
+          .then(() => {
+            User.findById({_id:id}).exec().then((user)=>{resolve(user)}).catch(err => reject(err))
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    }
+    ,
     deleteUserById: function (id) {
       return new Promise((resolve, reject) => {
         User.deleteOne({ _id: id })

@@ -79,15 +79,14 @@ app.post("/v1/login", (req, res) => {
   data
     .getUserByName(req.body)
     .then((data) => {
-      console.log(data)
-      var payload = {
+      let payload = {
         _id: data._id,
         UserName: data.UserName,
         Balance: data.Balance
       }
-      var token = jwt.sign(payload, jwtOptions.secretOrKey);
+      let token = jwt.sign(payload, jwtOptions.secretOrKey);
 
-      res.json({"message":"login successful", "token": token});
+      res.json({ "message": "login successful", "token": token });
     })
     .catch((err) => {
       res.status(422).json({ message: `an error occurred: ${err}` });
@@ -97,6 +96,19 @@ app.post("/v1/login", (req, res) => {
 });
 
 app.put("/v1/users/:id", (req, res) => {
+  if(req.query.Balance){
+    data.updateUserBalance(req.query.Balance, req.params.id).then((data) => {
+      let payload = {
+        _id: data._id,
+        UserName: data.UserName,
+        Balance: data.Balance
+      }
+      let token = jwt.sign(payload, jwtOptions.secretOrKey);
+
+      res.json({ "message": "Balance Updated", "token": token });
+    }).catch((err) => res.json(err));
+  }
+  else {
   data
     .updateUserById(req.body, req.params.id)
     .then((msg) => {
@@ -105,6 +117,9 @@ app.put("/v1/users/:id", (req, res) => {
     .catch((err) => {
       res.json({ message: `an error occurred: ${err}` });
     });
+  }
+
+
 });
 
 app.delete("/v1/users/:id", (req, res) => {
