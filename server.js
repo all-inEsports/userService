@@ -24,6 +24,7 @@ var strategy = new JwtStrategy(jwtOptions, function (jwt_payload, next) {
       next(null, { 
           _id: jwt_payload._id, 
           UserName: jwt_payload.UserName,
+          ProfilePic: jwt_payload.ProfilePic,
           Balance: jwt_payload.Balance 
         }); 
   } else {
@@ -82,6 +83,7 @@ app.post("/v1/login", (req, res) => {
       let payload = {
         _id: data._id,
         UserName: data.UserName,
+        ProfilePic: data.ProfilePic,
         Balance: data.Balance
       }
       let token = jwt.sign(payload, jwtOptions.secretOrKey);
