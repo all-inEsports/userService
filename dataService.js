@@ -118,6 +118,24 @@ module.exports = (mongoDBConnectionString) => {
       });
     }
     ,
+    updateUserBalanceByUserName : function (Balance,UserName) {
+      return new Promise((resolve, reject) => {
+        User.updateOne(
+          { UserName },
+          {
+            Balance,
+          }
+        )
+          .exec()
+          .then(() => {
+            resolve(`Balance updated for ${UserName}`)
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    }
+    ,
     deleteUserById: function (id) {
       return new Promise((resolve, reject) => {
         User.deleteOne({ _id: id })
