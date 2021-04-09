@@ -102,6 +102,7 @@ app.put("/v1/users/:id", (req, res) => {
     data.updateUserBalance(req.query.Balance, req.params.id).then((data) => {
       let payload = {
         _id: data._id,
+        ProfilePic: jwt_payload.ProfilePic,
         UserName: data.UserName,
         Balance: data.Balance
       }
@@ -113,10 +114,17 @@ app.put("/v1/users/:id", (req, res) => {
   else {
   data
     .updateUserById(req.body, req.params.id)
-    .then((msg) => {
-      res.json({ message: msg });
-    })
-    .catch((err) => {
+    .then((data) => {
+      let payload = {
+        _id: data._id,
+        ProfilePic: jwt_payload.ProfilePic,
+        UserName: data.UserName,
+        Balance: data.Balance
+      }
+      let token = jwt.sign(payload, jwtOptions.secretOrKey);
+
+      res.json({ "message": "Balance Updated", "token": token });
+    }).catch((err) => {
       res.json({ message: `an error occurred: ${err}` });
     });
   }
