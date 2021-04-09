@@ -49,7 +49,14 @@ app.get("/v1/users/:id", async (req, res) => {
       res.json({ message: `an error occurred: ${err}` });
     });
 });
-
+app.post("/v1/balance/:username", (req,res) => {
+    data.updateUserBalanceByUserName(req.body.Balance,req.params.username)
+    .then((msg) => {
+       res.status(200).json({message:msg});
+    }).catch((err) => {
+      res.status(422).json({ message: `an error occurred: ${err}` });
+    });
+})
 app.post("/v1/login", (req, res) => {
   data
     .getUserByName(req.body)
