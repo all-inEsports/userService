@@ -68,9 +68,8 @@ module.exports = (mongoDBConnectionString) => {
               reject("Incorrect Password."); 
             }
         })
-        .catch((err)=>reject(err))
+        .catch((err)=>reject(`${err}`))
       });
-
     },
     getUserById: function (id) {
       return new Promise((resolve, reject) => {

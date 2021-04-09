@@ -7,10 +7,36 @@ const cors = require("cors");
 const data = require("./dataService")(process.env.URI);
 const port = process.env.PORT || 3000;
 const jwt = require('jsonwebtoken');
+const passport = require("passport");
+const passportJWT = require("passport-jwt");
+var ExtractJwt = passportJWT.ExtractJwt;
+var JwtStrategy = passportJWT.Strategy;
 
 var jwtOptions = {};
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme("jwt");
 
 jwtOptions.secretOrKey = '&0y7$noP#5rt99&GB%Pz7j2b1vkzaB0RKs%^N^0zOP89NT04mPuaM!&G8cbNZOtH';
+
+var strategy = new JwtStrategy(jwtOptions, function (jwt_payload, next) {
+  console.log('payload received', jwt_payload);
+
+  if (jwt_payload) {
+      next(null, { 
+          _id: jwt_payload._id, 
+          UserName: jwt_payload.UserName,
+          ProfilePic: jwt_payload.ProfilePic,
+          Balance: jwt_payload.Balance 
+        }); 
+  } else {
+      next(null, false);
+  }
+});
+
+passport.use(strategy);
+
+app.use(passport.initialize());
+
+
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -64,6 +90,7 @@ app.post("/v1/login", (req, res) => {
       let payload = {
         _id: data._id,
         UserName: data.UserName,
+        ProfilePic: data.ProfilePic,
         Balance: data.Balance
       }
       let token = jwt.sign(payload, jwtOptions.secretOrKey);
@@ -73,6 +100,8 @@ app.post("/v1/login", (req, res) => {
     .catch((err) => {
       res.status(422).json({ message: `an error occurred: ${err}` });
     });
+
+    
 });
 
 app.put("/v1/users/:id", (req, res) => {
